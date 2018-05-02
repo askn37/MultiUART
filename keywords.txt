@@ -1,0 +1,37 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+MultiUART	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+listen	KEYWORD2
+isListening	KEYWORD2
+stopListening	KEYWORD2
+end	KEYWORD2
+overflow	KEYWORD2
+getBaseClock	KEYWORD2
+setRxBuffer	KEYWORD2
+setWriteBack	KEYWORD2
+
+write	KEYWORD2
+read	KEYWORD2
+
+peek	KEYWORD2
+flush	KEYWORD2
+available	KEYWORD2
+availableForWrite	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MULTIUART_BASEFREQ	LITERAL1
+MULTIUART_RX_BUFF_LEN	LITERAL1
+MULTIUART_RX_LISTEN_LEN	LITERAL1
+MULTIUART_CTC_TOP	LITERAL1
+
