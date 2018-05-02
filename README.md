@@ -26,7 +26,7 @@ Arduino標準の SoftwareSerialは、とても良く出来てはいるものの�
 
 # Arduino IDE への導入
 
-1. .ZIPアーカイブをダウンロードする。[Click here](https://github.com/askn37/MultiUART/archive/download.zip)
+1. .ZIPアーカイブをダウンロードする。[Click here](https://github.com/askn37/MultiUART/archive/master.zip)
 
 2. ライブラリマネージャで読み込む
 
