@@ -25,48 +25,48 @@ void setup (void) {
     UART3.begin(9600);
     UART4.begin(9600);
 
-	Serial.println("Four UART devices multiple receive demo");
+    Serial.println("Four UART devices multiple receive demo");
 }
 
 void loop (void) {
-	// console redirect, target UART4
-	if (Serial.available()) {
-		while (Serial.available()) {
-			UART4.write(Serial.read());
-		}
-	}
+    // console redirect, target UART4
+    if (Serial.available()) {
+        while (Serial.available()) {
+            UART4.write(Serial.read());
+        }
+    }
 
-	if (UART1.available()) {
-		Serial.print("UART1:");
-		while (UART1.available()) {
-			Serial.write(UART1.read());
-		}
-		Serial.println();
-	}
+    if (UART1.available()) {
+        Serial.print("UART1:");
+        while (UART1.available()) {
+            Serial.write(UART1.read());
+        }
+        Serial.println();
+    }
 
-	if (UART2.available()) {
-		Serial.print("UART2:");
-		while (UART2.available()) {
-			Serial.write(UART2.read());
-		}
-		Serial.println();
-	}
+    if (UART2.available()) {
+        Serial.print("UART2:");
+        while (UART2.available()) {
+            Serial.write(UART2.read());
+        }
+        Serial.println();
+    }
 
-	if (UART3.available()) {
-		Serial.print("UART3:");
-		while (UART3.available()) {
-			Serial.write(UART3.read());
-		}
-		Serial.println();
-	}
+    if (UART3.available()) {
+        Serial.print("UART3:");
+        while (UART3.available()) {
+            Serial.write(UART3.read());
+        }
+        Serial.println();
+    }
 
-	if (UART4.available()) {
-		Serial.print("UART4:");
-		while (UART4.available()) {
-			Serial.write(UART4.read());
-		}
-		Serial.println();
-	}
+    if (UART4.available()) {
+        Serial.print("UART4:");
+        while (UART4.available()) {
+            Serial.write(UART4.read());
+        }
+        Serial.println();
+    }
 }
 
 // end of code

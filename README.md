@@ -53,12 +53,12 @@ void setup() {
 }
 
 void loop() {
-    if (Serial.available()) {
-		UART.write(Serial.read());
-	}
-    while (UART.available()) {
-		Serial.write(UART.read());
-	}
+  if (Serial.available()) {
+    UART.write(Serial.read());
+  }
+  while (UART.available()) {
+    Serial.write(UART.read());
+  }
 }
 ```
 
@@ -124,7 +124,7 @@ SoftwareSerial と異なり、Invertedフラグは指定できない。
 ```c
 MultiUART TxOnly(-1, TX_PIN);			// 送信専用で write() だけが機能する
 MultiUART RxOnly(RX_PIN, -1);			// 受信専用で write() は何もしない
-MultiUART RxOnly(RX_PIN, RX_PIN);		// これも受信専用
+MultiUART RxOnly2(RX_PIN, RX_PIN);		// これも受信専用
 ```
 
 受信ピンと送信ピンに同じピン番号を与えると、送信ピン指定は無視されて、受信専用に設定される。
@@ -316,11 +316,11 @@ vool overflow = UART.overflow();
 // バッファを切断して溢れていなければ、内容を文字列として解釈
 UART.setRxBuffer();
 if (!overflow && len) {
-	MyBuffer[len] = '\0';
-	Serial.print(MyBuffer);
+  MyBuffer[len] = '\0';
+  Serial.print(MyBuffer);
 }
 else {
-	Serial.print("Overflow!");
+  Serial.print("Overflow!");
 }
 ```
 
@@ -344,9 +344,9 @@ else {
 // UART.write() が実行を終える度に呼び出されるコールバック
 // callback(&UART) の形で呼ばれる
 void callback (MultiUART* UART) {
-    while (UART->available()) {
-		Serial.write(UART->read());
-	}
+  while (UART->available()) {
+    Serial.write(UART->read());
+  }
 }
 
 // コールバック設定
@@ -354,7 +354,7 @@ UART.setWriteBack(callback);
 
 // 1キャラクタずつ転送
 while (Serial.available()) {
-	UART.write(Serial.read());
+  UART.write(Serial.read());
 }
 
 // 定型文送信

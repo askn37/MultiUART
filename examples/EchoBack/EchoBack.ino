@@ -20,7 +20,7 @@ void setup (void) {
 }
 
 void loop (void) {
-	if (UART.available()) UART.write(UART.read());
+    if (UART.available()) UART.write(UART.read());
 }
 
 // end of code
