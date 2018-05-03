@@ -5,7 +5,7 @@
  * target architectures: Atmel AVR (ATmega 328P, 1284P and other)
  *
  * release site: https://github.com/askn37/MultiUART
- * maintainer: askn <askn37@users.noreply.github.com>
+ * maintainer: askn https://twitter.com/askn37
  *
  */
 
@@ -25,7 +25,15 @@
 #define MULTIUART_RX_LISTEN_LEN   4
 #endif
 
+#if defined(MULTIUART_USED_TIMER2)
 #define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ / 8 - 1)
+#else
+#ifndef MULTIUART_USED_TIMER1
+#define MULTIUART_USED_TIMER1
+#endif
+#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ - 1)
+#endif
+
 #if MULTIUART_CTC_TOP < 15
 #error MULTIUART_BASEFREQ is under run, bad configuration from MultiUART
 #endif
@@ -34,25 +42,30 @@ class MultiUART : public Stream {
 private:
     volatile char buff[MULTIUART_RX_BUFF_LEN];
     volatile char* buffAddr;
-    volatile uint8_t *portRx;
     volatile uint8_t *portTx;
-    uint8_t portRxMask;
-    uint8_t portTxMask;
-    uint8_t portTxInvt;
+    volatile uint8_t portTxMask;
+    volatile uint8_t portRx;
+    volatile uint8_t portRxMask;
     volatile uint8_t bitCount;
-    uint8_t bitSkip;
-    uint8_t bitStart;
+    volatile uint8_t bitSkip;
+    volatile uint8_t bitStart;
     volatile uint8_t bitIn;
-    uint8_t buffMax;
+    volatile uint8_t buffMax;
     volatile uint8_t buffIn;
     volatile uint8_t buffOut;
-    uint8_t buffOver:1;
+    volatile uint8_t buffOver:1;
 
     typedef void (*MultiUART_CallBack)(MultiUART*);
     MultiUART_CallBack writeBack;
     static void writeBackEmpty (MultiUART*) {}
 
     static volatile MultiUART *listeners[MULTIUART_RX_LISTEN_LEN];
+    static volatile uint16_t bitSendBuff;
+    static volatile uint8_t* bitSendPort;
+    static volatile uint8_t bitSendMask;
+    static volatile uint8_t bitSendClear;
+    static volatile uint8_t bitSendSkip;
+    static volatile uint8_t bitSendCount;
     static volatile uint8_t baseClock;
 
 public:

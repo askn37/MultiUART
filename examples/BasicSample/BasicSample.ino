@@ -3,7 +3,7 @@
  * BasicSample - MultiUART Basic sample sketch
  *
  * release site: https://github.com/askn37/MultiUART
- * maintainer: askn <askn37@users.noreply.github.com>
+ * maintainer: askn https://twitter.com/askn37
  *
  */
 
