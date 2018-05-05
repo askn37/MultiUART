@@ -244,7 +244,7 @@ int MultiUART::peek (void) {
 
 int MultiUART::last (void) {
     if (buffIn == buffOut) return -1;           // empty rx buffer
-    uint8_t c = buffAddr[buffIn];
+    uint8_t c = buffAddr[(buffIn - 1) & buffMax];
     return c;
 }
 
