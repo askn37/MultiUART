@@ -500,5 +500,5 @@ MIT
 
 朝日薫/askn
 (SenseWay Inc.)
-Twitter: [@askn](https://twitter.com/askn37)
+Twitter: [@askn37](https://twitter.com/askn37)
 GitHub: https://github.com/askn37
