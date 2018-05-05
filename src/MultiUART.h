@@ -18,7 +18,7 @@
 #endif
 
 #ifndef MULTIUART_RX_BUFF_LEN
-#define MULTIUART_RX_BUFF_LEN   32
+#define MULTIUART_RX_BUFF_LEN   64
 #endif
 
 #ifndef MULTIUART_RX_LISTEN_LEN
@@ -73,10 +73,10 @@ public:
     ~MultiUART (void) { stopListening(); }
     inline operator bool (void) { return true; }
 
-    bool begin (long = 9600);
-    bool listen (void);
-    bool isListening (void);
-    bool stopListening (void);
+    virtual bool begin (long = 9600);
+    virtual bool listen (void);
+    virtual bool isListening (void);
+    virtual bool stopListening (void);
     void end (void) { stopListening(); }
     inline uint8_t getBaseClock (void) { return MultiUART::baseClock; }
 
@@ -86,6 +86,7 @@ public:
     using Stream::read;
     virtual int read (void);
     virtual int peek (void);
+    virtual int last (void);
     virtual inline void flush (void) {}
     virtual int available (void) { return ((uint8_t)(buffIn - buffOut) % buffMax); }
     bool overflow (void) { bool r = buffOver; if (r) buffOver = false; return r; }

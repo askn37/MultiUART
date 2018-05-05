@@ -15,6 +15,8 @@
 //
 // Interrupt handling
 //
+#pragma GCC optimize ("O3")
+
 #if defined(MULTIUART_USED_TIMER1)
 #if defined(TIMER1_COMPA_vect)
 ISR(TIMER1_COMPA_vect) {
@@ -88,15 +90,16 @@ inline void MultiUART::interrupt_handle (void) {
             }
             else if (!(active->bitCount % active->bitSkip)) {
                 active->bitIn >>= 1;
-                if (portin) active->bitIn |= 0x80;      // insert MSB
+                if (portin) active->bitIn |= 0x80;
             }
         }
-        else if (!portin) {     // find startbit edge
+        else if (!portin) {
             active->bitCount = active->bitStart;
             active->bitIn = 0;
         }
     }
 }
+#pragma GCC optimize ("Os")
 
 //
 // Constructor
@@ -236,6 +239,12 @@ int MultiUART::read (void) {
 int MultiUART::peek (void) {
     if (buffIn == buffOut) return -1;           // empty rx buffer
     uint8_t c = buffAddr[buffOut];
+    return c;
+}
+
+int MultiUART::last (void) {
+    if (buffIn == buffOut) return -1;           // empty rx buffer
+    uint8_t c = buffAddr[buffIn];
     return c;
 }
 
