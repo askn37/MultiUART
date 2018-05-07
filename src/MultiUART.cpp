@@ -98,6 +98,11 @@ inline void MultiUART::interrupt_handle (void) {
             active->bitIn = 0;
         }
     }
+
+    #ifdef MULTIUART_DEBUG_PULSE
+    // DEBUG PULSE A2 Pin
+    if ((baseClock & 7) == 0) PINC |= _BV(2);
+    #endif
 }
 #pragma GCC optimize ("Os")
 
@@ -118,17 +123,21 @@ MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN)
     uint8_t _rx = digitalPinToPort(_RX_PIN);
     uint8_t _tx = digitalPinToPort(_TX_PIN);
     if (_tx != NOT_A_PIN && _RX_PIN != _TX_PIN) {
-        portTx = portOutputRegister(_tx);
+        portTxReg = portOutputRegister(_tx);
         portTxMask = digitalPinToBitMask(_TX_PIN);
         digitalWrite(_TX_PIN, HIGH);
         pinMode(_TX_PIN, OUTPUT);
     }
     if (_rx != NOT_A_PIN) {
         portRx = _rx - 1;
+        portRxReg = portInputRegister(_rx);
         portRxMask = digitalPinToBitMask(_RX_PIN);
         pinMode(_RX_PIN, INPUT);
         digitalWrite(_RX_PIN, HIGH);
     }
+    #ifdef MULTIUART_DEBUG_PULSE
+    pinMode(A2, OUTPUT);
+    #endif
 }
 
 //
@@ -137,33 +146,44 @@ MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN)
 bool MultiUART::begin (long _speed) {
     // TIMER2 CTC TOP clk/8
     bitSkip = MULTIUART_BASEFREQ / _speed;
-    bitStart = bitSkip * 9 + 1;
+    bitStart = (bitSkip * 95) / 10;
 
     uint8_t useListen = 0;
     for (auto&& active : MultiUART::listeners) {
         if (active != NULL) useListen++;
     }
-    if (!useListen) {
-        uint8_t oldSREG = SREG;
-        noInterrupts();                         // := cli()
-        #if defined(MULTIUART_USED_TIMER1)
-        TCCR1A = 0;
-        TCCR1B = _BV(WGM12) | _BV(CS10);
-        OCR1AH = MULTIUART_CTC_TOP >> 8;
-        OCR1AL = MULTIUART_CTC_TOP & 0xFF;
-        TCNT1H = 0;
-        TCNT1L = 0;
-        TIMSK1 |= _BV(OCIE1A);
-        #elif defined(MULTIUART_USED_TIMER2)
-        TCCR2A = _BV(WGM21);
-        TCCR2B = _BV(CS21);
-        OCR2A = MULTIUART_CTC_TOP;
-        TCNT2 = MultiUART::baseClock = 0;
-        TIMSK2 |= _BV(OCIE2A);
-        #endif
-        SREG = oldSREG;
-    }
+    if (!useListen) setThrottle();
     return listen();
+}
+
+void MultiUART::setThrottle (uint16_t throttle) {
+    uint32_t baseCount = MULTIUART_CTC_TOP * 1000 / throttle - 1;
+    uint8_t oldSREG = SREG;
+    noInterrupts();
+    #if defined(MULTIUART_USED_TIMER1)
+    // TIMER1 clk/1
+    TCCR1A = 0;
+    TCCR1B = _BV(WGM12) | _BV(CS10);
+    OCR1AH = (baseCount >> 8) & 0xFF;
+    OCR1AL = MULTIUART_CTC_TOP & 0xFF;
+    TCNT1H = 0;
+    TCNT1L = 0;
+    TIMSK1 |= _BV(OCIE1A);
+    #ifdef MULTIUART_DEBUG_PULSE
+    Serial.print(F("Timer1:")); Serial.println(baseCount);
+    #endif
+    #elif defined(MULTIUART_USED_TIMER2)
+    // TIMER2 clk/8
+    TCCR2A = _BV(WGM21);
+    TCCR2B = _BV(CS21);
+    OCR2A = (uint8_t) baseCount;
+    TCNT2 = MultiUART::baseClock = 0;
+    TIMSK2 |= _BV(OCIE2A);
+    #ifdef MULTIUART_DEBUG_PULSE
+    Serial.print(F("Timer2:")); Serial.println(baseCount);
+    #endif
+    #endif
+    SREG = oldSREG;
 }
 
 bool MultiUART::listen (void) {
@@ -217,12 +237,12 @@ void MultiUART::setRxBuffer (volatile char* _buffAddr, int _buffMax) {
 size_t MultiUART::write (const uint8_t c) {
     if (portTxMask && bit_is_set(SREG, SREG_I)) {
         while (MultiUART::bitSendCount);
-        MultiUART::bitSendPort = portTx;
+        MultiUART::bitSendPort = portTxReg;
         MultiUART::bitSendMask = portTxMask;
         MultiUART::bitSendClear = ~portTxMask;
         MultiUART::bitSendSkip = bitSkip;
         MultiUART::bitSendBuff = 0x200 | (c << 1);
-        MultiUART::bitSendCount = bitStart + 1;
+        MultiUART::bitSendCount = bitSkip * 10;
         while (MultiUART::bitSendCount);
         writeBack(this);
     }

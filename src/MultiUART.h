@@ -14,24 +14,31 @@
 #define __MULTIUART_H
 
 #ifndef MULTIUART_BASEFREQ
-#define MULTIUART_BASEFREQ  19200
+#define MULTIUART_BASEFREQ 19200
+#endif
+
+#ifndef MULTIUART_BASEFREQ_THROTTLE
+#define MULTIUART_BASEFREQ_THROTTLE 1000
 #endif
 
 #ifndef MULTIUART_RX_BUFF_LEN
-#define MULTIUART_RX_BUFF_LEN   64
+#define MULTIUART_RX_BUFF_LEN 64
 #endif
 
 #ifndef MULTIUART_RX_LISTEN_LEN
-#define MULTIUART_RX_LISTEN_LEN   4
+#define MULTIUART_RX_LISTEN_LEN 4
 #endif
 
+// // using pinOut A2
+// #define MULTIUART_DEBUG_PULSE
+
 #if defined(MULTIUART_USED_TIMER2)
-#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ / 8 - 1 - 1)
+#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ / 8)
 #else
 #ifndef MULTIUART_USED_TIMER1
 #define MULTIUART_USED_TIMER1
 #endif
-#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ - 1 - 8)
+#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ)
 #endif
 
 #if MULTIUART_CTC_TOP < 15
@@ -42,7 +49,8 @@ class MultiUART : public Stream {
 private:
     volatile char buff[MULTIUART_RX_BUFF_LEN];
     volatile char* buffAddr;
-    volatile uint8_t *portTx;
+    volatile uint8_t *portTxReg;
+    volatile uint8_t *portRxReg;
     volatile uint8_t portTxMask;
     volatile uint8_t portRx;
     volatile uint8_t portRxMask;
@@ -78,6 +86,7 @@ public:
     virtual bool isListening (void);
     virtual bool stopListening (void);
     void end (void) { stopListening(); }
+    void setThrottle (uint16_t = MULTIUART_BASEFREQ_THROTTLE);
     inline uint8_t getBaseClock (void) { return MultiUART::baseClock; }
 
     void setRxBuffer (volatile char* = NULL, int = 0);
