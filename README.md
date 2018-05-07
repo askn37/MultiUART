@@ -1,6 +1,6 @@
 # MultiUART
 
-復数のUARTデバイスを扱える SoftwareSerial の代替ライブラリ
+復数のUARTデバイスを扱える SoftwareSerial の代替実装（for Arduino IDE）
 
 # 概要
 
