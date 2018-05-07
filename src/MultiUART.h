@@ -86,7 +86,6 @@ public:
     virtual bool isListening (void);
     virtual bool stopListening (void);
     void end (void) { stopListening(); }
-    void setThrottle (uint16_t = MULTIUART_BASEFREQ_THROTTLE);
     inline uint8_t getBaseClock (void) { return MultiUART::baseClock; }
 
     void setRxBuffer (volatile char* = NULL, int = 0);
@@ -105,6 +104,7 @@ public:
     virtual size_t write (const uint8_t);
     virtual inline int availableForWrite (void) { return 1; }
 
+    static void setThrottle (uint16_t = MULTIUART_BASEFREQ_THROTTLE);
     static inline void interrupt_handle (void) __attribute__((__always_inline__));
 };
 
