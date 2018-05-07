@@ -106,6 +106,36 @@ inline void MultiUART::interrupt_handle (void) {
 }
 #pragma GCC optimize ("Os")
 
+void MultiUART::setThrottle (uint16_t throttle) {
+    uint32_t baseCount = MULTIUART_CTC_TOP * 1000 / throttle - 1;
+    uint8_t oldSREG = SREG;
+    noInterrupts();
+    #if defined(MULTIUART_USED_TIMER1)
+    // TIMER1 clk/1
+    TCCR1A = 0;
+    TCCR1B = _BV(WGM12) | _BV(CS10);
+    OCR1AH = (baseCount >> 8) & 0xFF;
+    OCR1AL = MULTIUART_CTC_TOP & 0xFF;
+    TCNT1H = 0;
+    TCNT1L = 0;
+    TIMSK1 |= _BV(OCIE1A);
+    #ifdef MULTIUART_DEBUG_PULSE
+    Serial.print(F("Timer1:")); Serial.println(baseCount);
+    #endif
+    #elif defined(MULTIUART_USED_TIMER2)
+    // TIMER2 clk/8
+    TCCR2A = _BV(WGM21);
+    TCCR2B = _BV(CS21);
+    OCR2A = (uint8_t) baseCount;
+    TCNT2 = MultiUART::baseClock = 0;
+    TIMSK2 |= _BV(OCIE2A);
+    #ifdef MULTIUART_DEBUG_PULSE
+    Serial.print(F("Timer2:")); Serial.println(baseCount);
+    #endif
+    #endif
+    SREG = oldSREG;
+}
+
 //
 // Constructor
 //
@@ -138,6 +168,12 @@ MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN)
     #ifdef MULTIUART_DEBUG_PULSE
     pinMode(A2, OUTPUT);
     #endif
+    #if defined(MULTIUART_USED_TIMER1)
+    uint8_t ocie = TIMSK1 & _BV(OCIE1A);
+    #elif defined(MULTIUART_USED_TIMER2)
+    uint8_t ocie = TIMSK2 & _BV(OCIE2A);
+    #endif
+    if (!ocie) MultiUART::setThrottle(MULTIUART_BASEFREQ_THROTTLE);
 }
 
 //
@@ -147,43 +183,7 @@ bool MultiUART::begin (long _speed) {
     // TIMER2 CTC TOP clk/8
     bitSkip = MULTIUART_BASEFREQ / _speed;
     bitStart = (bitSkip * 95) / 10;
-
-    uint8_t useListen = 0;
-    for (auto&& active : MultiUART::listeners) {
-        if (active != NULL) useListen++;
-    }
-    if (!useListen) setThrottle();
     return listen();
-}
-
-void MultiUART::setThrottle (uint16_t throttle) {
-    uint32_t baseCount = MULTIUART_CTC_TOP * 1000 / throttle - 1;
-    uint8_t oldSREG = SREG;
-    noInterrupts();
-    #if defined(MULTIUART_USED_TIMER1)
-    // TIMER1 clk/1
-    TCCR1A = 0;
-    TCCR1B = _BV(WGM12) | _BV(CS10);
-    OCR1AH = (baseCount >> 8) & 0xFF;
-    OCR1AL = MULTIUART_CTC_TOP & 0xFF;
-    TCNT1H = 0;
-    TCNT1L = 0;
-    TIMSK1 |= _BV(OCIE1A);
-    #ifdef MULTIUART_DEBUG_PULSE
-    Serial.print(F("Timer1:")); Serial.println(baseCount);
-    #endif
-    #elif defined(MULTIUART_USED_TIMER2)
-    // TIMER2 clk/8
-    TCCR2A = _BV(WGM21);
-    TCCR2B = _BV(CS21);
-    OCR2A = (uint8_t) baseCount;
-    TCNT2 = MultiUART::baseClock = 0;
-    TIMSK2 |= _BV(OCIE2A);
-    #ifdef MULTIUART_DEBUG_PULSE
-    Serial.print(F("Timer2:")); Serial.println(baseCount);
-    #endif
-    #endif
-    SREG = oldSREG;
 }
 
 bool MultiUART::listen (void) {
