@@ -114,8 +114,8 @@ void MultiUART::setThrottle (uint16_t throttle) {
     // TIMER1 clk/1
     TCCR1A = 0;
     TCCR1B = _BV(WGM12) | _BV(CS10);
-    OCR1AH = (baseCount >> 8) & 0xFF;
-    OCR1AL = MULTIUART_CTC_TOP & 0xFF;
+    OCR1AH = (uint8_t)((baseCount >> 8) & 0xFF);
+    OCR1AL = (uint8_t)(baseCount & 0xFF);
     TCNT1H = 0;
     TCNT1L = 0;
     TIMSK1 |= _BV(OCIE1A);
