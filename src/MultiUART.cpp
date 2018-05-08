@@ -41,7 +41,7 @@ volatile uint8_t MultiUART::bitSendCount = 0;
 volatile uint8_t MultiUART::baseClock = 0;
 
 inline void MultiUART::interrupt_handle (void) {
-    static volatile uint8_t portRxIn[4] = {0};
+    uint8_t portRxIn[4] = {0};
     MultiUART::baseClock++;
 
     // Recive Registrers
@@ -56,6 +56,11 @@ inline void MultiUART::interrupt_handle (void) {
     #endif
     #if defined(PIND)
     portRxIn[3] = PIND;
+    #endif
+
+    #ifdef MULTIUART_DEBUG_PULSE
+    // DEBUG PULSE A2 Pin
+    PINC |= _BV(2);
     #endif
 
     // Transmitter
@@ -98,11 +103,6 @@ inline void MultiUART::interrupt_handle (void) {
             active->bitIn = 0;
         }
     }
-
-    #ifdef MULTIUART_DEBUG_PULSE
-    // DEBUG PULSE A2 Pin
-    if ((baseClock & 7) == 0) PINC |= _BV(2);
-    #endif
 }
 #pragma GCC optimize ("Os")
 

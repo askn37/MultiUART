@@ -17,6 +17,7 @@ overflow	KEYWORD2
 getBaseClock	KEYWORD2
 setRxBuffer	KEYWORD2
 setWriteBack	KEYWORD2
+setThrottle	KEYWORD2
 
 write	KEYWORD2
 read	KEYWORD2
@@ -25,6 +26,9 @@ peek	KEYWORD2
 flush	KEYWORD2
 available	KEYWORD2
 availableForWrite	KEYWORD2
+
+print	KEYWORD2
+println	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
