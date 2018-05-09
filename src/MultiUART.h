@@ -29,8 +29,8 @@
 #define MULTIUART_RX_LISTEN_LEN 4
 #endif
 
-// // using pinOut A2
-// #define MULTIUART_DEBUG_PULSE
+//// using pinOut A2
+#define MULTIUART_DEBUG_PULSE
 
 #if defined(MULTIUART_USED_TIMER2)
 #define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ / 8)
@@ -68,6 +68,7 @@ private:
     static void writeBackEmpty (MultiUART*) {}
 
     static volatile MultiUART *listeners[MULTIUART_RX_LISTEN_LEN];
+    static volatile uint16_t throttle;
     static volatile uint16_t bitSendBuff;
     static volatile uint8_t* bitSendPort;
     static volatile uint8_t bitSendMask;

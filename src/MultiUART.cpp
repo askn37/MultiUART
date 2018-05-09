@@ -32,6 +32,7 @@ ISR(TIMER2_COMPA_vect) {
 #endif
 
 volatile MultiUART* MultiUART::listeners[MULTIUART_RX_LISTEN_LEN] = {NULL};
+volatile uint16_t MultiUART::throttle = MULTIUART_BASEFREQ_THROTTLE;
 volatile uint16_t MultiUART::bitSendBuff = 0;
 volatile uint8_t* MultiUART::bitSendPort;
 volatile uint8_t MultiUART::bitSendMask = 0;
@@ -106,10 +107,14 @@ inline void MultiUART::interrupt_handle (void) {
 }
 #pragma GCC optimize ("Os")
 
-void MultiUART::setThrottle (uint16_t throttle) {
-    uint32_t baseCount = MULTIUART_CTC_TOP * 1000 / throttle - 1;
+void MultiUART::setThrottle (uint16_t _throttle) {
+    uint32_t baseCount = MULTIUART_CTC_TOP * 1000 / _throttle - 1;
     uint8_t oldSREG = SREG;
+    MultiUART::throttle = _throttle;
     noInterrupts();
+    #ifdef MULTIUART_DEBUG_PULSE
+    pinMode(A2, OUTPUT);
+    #endif
     #if defined(MULTIUART_USED_TIMER1)
     // TIMER1 clk/1
     TCCR1A = 0;
@@ -119,9 +124,6 @@ void MultiUART::setThrottle (uint16_t throttle) {
     TCNT1H = 0;
     TCNT1L = 0;
     TIMSK1 |= _BV(OCIE1A);
-    #ifdef MULTIUART_DEBUG_PULSE
-    Serial.print(F("Timer1:")); Serial.println(baseCount);
-    #endif
     #elif defined(MULTIUART_USED_TIMER2)
     // TIMER2 clk/8
     TCCR2A = _BV(WGM21);
@@ -129,9 +131,6 @@ void MultiUART::setThrottle (uint16_t throttle) {
     OCR2A = (uint8_t) baseCount;
     TCNT2 = MultiUART::baseClock = 0;
     TIMSK2 |= _BV(OCIE2A);
-    #ifdef MULTIUART_DEBUG_PULSE
-    Serial.print(F("Timer2:")); Serial.println(baseCount);
-    #endif
     #endif
     SREG = oldSREG;
 }
@@ -165,15 +164,6 @@ MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN)
         pinMode(_RX_PIN, INPUT);
         digitalWrite(_RX_PIN, HIGH);
     }
-    #ifdef MULTIUART_DEBUG_PULSE
-    pinMode(A2, OUTPUT);
-    #endif
-    #if defined(MULTIUART_USED_TIMER1)
-    uint8_t ocie = TIMSK1 & _BV(OCIE1A);
-    #elif defined(MULTIUART_USED_TIMER2)
-    uint8_t ocie = TIMSK2 & _BV(OCIE2A);
-    #endif
-    if (!ocie) MultiUART::setThrottle(MULTIUART_BASEFREQ_THROTTLE);
 }
 
 //
@@ -183,6 +173,11 @@ bool MultiUART::begin (long _speed) {
     // TIMER2 CTC TOP clk/8
     bitSkip = MULTIUART_BASEFREQ / _speed;
     bitStart = (bitSkip * 95) / 10;
+    bool _check = true;
+    for (auto&& active : MultiUART::listeners) {
+        if (active != NULL) _check = false;
+    }
+    if (_check) MultiUART::setThrottle(MultiUART::throttle);
     return listen();
 }
 
