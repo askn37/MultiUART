@@ -32,7 +32,7 @@ ISR(TIMER2_COMPA_vect) {
 #endif
 
 volatile MultiUART* MultiUART::listeners[MULTIUART_RX_LISTEN_LEN] = {NULL};
-volatile uint16_t MultiUART::throttle = MULTIUART_BASEFREQ_THROTTLE;
+volatile uint16_t MultiUART::throttle = 0;
 volatile uint16_t MultiUART::bitSendBuff = 0;
 volatile uint8_t* MultiUART::bitSendPort;
 volatile uint8_t MultiUART::bitSendMask = 0;
@@ -173,11 +173,7 @@ bool MultiUART::begin (long _speed) {
     // TIMER2 CTC TOP clk/8
     bitSkip = MULTIUART_BASEFREQ / _speed;
     bitStart = (bitSkip * 95) / 10;
-    bool _check = true;
-    for (auto&& active : MultiUART::listeners) {
-        if (active != NULL) _check = false;
-    }
-    if (_check) MultiUART::setThrottle(MultiUART::throttle);
+    if (!MultiUART::throttle) MultiUART::setThrottle(MULTIUART_BASEFREQ_THROTTLE);
     return listen();
 }
 
@@ -215,7 +211,7 @@ bool MultiUART::stopListening (void) {
 
 void MultiUART::setRxBuffer (volatile char* _buffAddr, int _buffMax) {
     uint8_t oldSREG = SREG;
-    noInterrupts();                             // := cli()
+    noInterrupts();
     if (_buffAddr) {
         buffAddr = &_buffAddr[0];
         buffMax = (uint8_t)(_buffMax - 1);

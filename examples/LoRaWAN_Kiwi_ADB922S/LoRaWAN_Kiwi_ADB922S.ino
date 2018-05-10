@@ -7,7 +7,6 @@
  *
  */
 
-// #define MULTIUART_BASEFREQ  19200
 #include <Arduino.h>
 #include "MultiUART.h"
 
