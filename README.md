@@ -39,7 +39,7 @@ OSCCALレジスタによる周波数校正によっては動作することは�
 
 2. ライブラリマネージャで読み込む
 
-	スケッチ -> ライブラリをインクルード -> .ZIP形式のライブラリをインストール...
+  スケッチ -> ライブラリをインクルード -> .ZIP形式のライブラリをインストール...
 
 # 使い方
 
@@ -94,7 +94,7 @@ MCUの処理能力（CPUクロックや割込頻度）によっては受信デ�
 begin() に指定できるボーレートは、通常の使用範囲では 9600(bps)が最大である。
 実用上の最小値は 768(bps)で、その間には 19200 の約数が指定できる。
 
-	9600 6400 4800 3840 3200 2400 1920 1600 1280 1200 960 800 768
+    9600 6400 4800 3840 3200 2400 1920 1600 1280 1200 960 800 768
 
 # リファレンス
 
@@ -143,7 +143,7 @@ MultiUART RxOnly2(RX_PIN, RX_PIN);		// これも受信専用
 ### MultiUART (HardwereSerial& SERIAL)
 
 通常のコンストラクタ初期化に代えて、HardwereSerialクラスオブジェクトを渡すと
-MultiUARTは HardwereSerialへのブリッジとして機能するようになる。
+MultiUARTは HardwereSerialへの透過的ブリッジとして機能するようになる。
 
 ```c
 // もっぱらグローバルなオブジェクトとして
@@ -160,9 +160,18 @@ CON->begin(9600);
 AVRによるハードウェア支援のされたハードウェアシリアルを
 選択する自由を与える。
 
-MultiUARTの機能のうち、overflow() と isFraming() は機能しないが
-last() はサポートされる。
-また受信バッファは MultiUART と HardwareSerial 両方の合計となる。
+MultiUARTの機能のうち、last() や setRxBuffer() 等が使用可能になる。
+一方で以下のメソッドは機能しないか意味をなさない。
+
+    overflow() isFraming() listen() isListening() stopListening() setThrottle()
+
+以下のメソッドは MultiUART では機能しないが、HardwareSerialブリッジでは機能する
+
+    flush() availableForWrite()
+
+同時使用可能な UART数に、HardwareSerialブリッジは含まれない。
+
+受信バッファは MultiUART と HardwareSerial 両方の合計となる。
 （available() 等の読込系メソッドを実行することで、MultiUART のバッファに転送される）
 
 本機能は 0.9.6 で実装された。
@@ -341,6 +350,8 @@ HardwareSerial ブリッジに対しては額面通りに機能する。
 送信バッファの空き文字数を返す。
 しかしながら本ライブラリは送信バッファを持たないので、このメソッドは常に 1を返す。
 
+HardwareSerial ブリッジに対しては額面通りに機能する。
+
 ## ユーティリティ／実験的実装
 
 ### uint8_t getBaseClock (void)
@@ -358,7 +369,7 @@ HardwareSerial ブリッジに対しては額面通りに機能する。
 従って指定できる値は実用上、以下の値に限られる。
 これら以外の指定は意図した結果を得られないだろう。
 
-	256 128 (64 32 16)
+    256 128 (64 32 16)
 
 このメソッドを用いても、オブジェクトが持つ規定のバッファがメモリから開放されることはない。
 その既定値は 64であるため、この機能をが必要になる場面はそう多くはない。
@@ -469,16 +480,16 @@ HardwareSerial ブリッジに対しても同様に機能する。
 
 Stream と Print クラスを継承しているため、以下のメソッドが機能する。
 
-	print() println()
+    print() println()
 
 以下のメソッドは使えるはずだが、充分にはテストされていない。
 
-	setTimeout() find() findUntil() readBytes() readBytesUntil()
-	readString() readStringUntil() parseInt() parseFloat()
+    setTimeout() find() findUntil() readBytes() readBytesUntil()
+    readString() readStringUntil() parseInt() parseFloat()
 
 以下のコールバック関数宣言はサポートされない。
 
-	serialEvent()
+    serialEvent()
 
 
 # 応用
@@ -527,7 +538,7 @@ Stream と Print クラスを継承しているため、以下のメソッドが
 指定できる値には制約があり、256以下でかつ2のべき乗数としなければならない。
 すなわち指定できる値は実用上、以下の値に限られる。
 
-	256 128 64 32 16
+    256 128 64 32 16
 
 この値の変更は SRAMの空き容量とバーターである。
 さらに現状では、個別のオブジェクト毎に割り当てを変えることも出来ない。
