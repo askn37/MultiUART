@@ -77,8 +77,12 @@ private:
     static volatile uint8_t bitSendCount;
     static volatile uint8_t baseClock;
 
+    HardwareSerial *hSerial;
+    void hSerialReader (void);
+
 public:
     MultiUART (uint8_t, uint8_t);
+    MultiUART (HardwareSerial&);
     ~MultiUART (void) { stopListening(); }
     inline operator bool (void) { return true; }
 
@@ -86,7 +90,7 @@ public:
     virtual bool listen (void);
     virtual bool isListening (void);
     virtual bool stopListening (void);
-    void end (void) { stopListening(); }
+    void end (void) { if (hSerial) hSerial->end(); else stopListening(); }
     inline uint8_t getBaseClock (void) { return MultiUART::baseClock; }
 
     void setRxBuffer (volatile char* = NULL, int = 0);
@@ -96,14 +100,14 @@ public:
     virtual int read (void);
     virtual int peek (void);
     virtual int last (void);
-    virtual inline void flush (void) {}
-    virtual int available (void) { return ((uint8_t)(buffIn - buffOut) % buffMax); }
+    virtual inline void flush (void) { if (hSerial) hSerial->flush(); }
+    virtual int available (void);
     bool overflow (void) { bool r = buffOver; if (r) buffOver = false; return r; }
     inline bool isFraming (void) { return bitCount; }
 
     using Print::write;
     virtual size_t write (const uint8_t);
-    virtual inline int availableForWrite (void) { return 1; }
+    virtual int availableForWrite (void);
 
     static void setThrottle (uint16_t = MULTIUART_BASEFREQ_THROTTLE);
     static inline void interrupt_handle (void) __attribute__((__always_inline__));

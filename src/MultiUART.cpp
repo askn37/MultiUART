@@ -166,14 +166,31 @@ MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN)
     }
 }
 
+MultiUART::MultiUART (HardwareSerial& _SERIAL)
+    : bitCount(0)
+    , buffAddr(&buff[0])
+    , buffIn(0)
+    , buffOut(0)
+    , buffMax(MULTIUART_RX_BUFF_LEN - 1)
+    , buffOver(false)
+    , portRxMask(0)
+    , portTxMask(0)
+    , writeBack(writeBackEmpty)
+{
+    hSerial = &_SERIAL;
+}
+
 //
 // Methods and Functions
 //
 bool MultiUART::begin (long _speed) {
-    // TIMER2 CTC TOP clk/8
+    if (!MultiUART::throttle) MultiUART::setThrottle(MULTIUART_BASEFREQ_THROTTLE);
+    if (hSerial) {
+        hSerial->begin(_speed);
+        return true;
+    }
     bitSkip = MULTIUART_BASEFREQ / _speed;
     bitStart = (bitSkip * 95) / 10;
-    if (!MultiUART::throttle) MultiUART::setThrottle(MULTIUART_BASEFREQ_THROTTLE);
     return listen();
 }
 
@@ -193,6 +210,7 @@ bool MultiUART::listen (void) {
 }
 
 bool MultiUART::isListening (void) {
+    if (hSerial) return true;
     for (auto&& active : MultiUART::listeners) {
         if (active == this) return true;
     }
@@ -200,6 +218,7 @@ bool MultiUART::isListening (void) {
 }
 
 bool MultiUART::stopListening (void) {
+    if (hSerial) return false;
     for (auto&& active : MultiUART::listeners) {
         if (active == this) {
             active = NULL;
@@ -226,7 +245,15 @@ void MultiUART::setRxBuffer (volatile char* _buffAddr, int _buffMax) {
 }
 
 size_t MultiUART::write (const uint8_t c) {
-    if (portTxMask && bit_is_set(SREG, SREG_I)) {
+    if (hSerial) {
+        if (hSerial->write(c)) {
+            writeBack(this);
+        }
+        else {
+            return 0;
+        }
+    }
+    else if (portTxMask && bit_is_set(SREG, SREG_I)) {
         while (MultiUART::bitSendCount);
         MultiUART::bitSendPort = portTxReg;
         MultiUART::bitSendMask = portTxMask;
@@ -241,6 +268,7 @@ size_t MultiUART::write (const uint8_t c) {
 }
 
 int MultiUART::read (void) {
+    if (hSerial) hSerialReader();
     if (buffIn == buffOut) return -1;           // empty rx buffer
     uint8_t c = buffAddr[buffOut++];
     buffOut &= buffMax;
@@ -248,15 +276,34 @@ int MultiUART::read (void) {
 }
 
 int MultiUART::peek (void) {
+    if (hSerial) hSerialReader();
     if (buffIn == buffOut) return -1;           // empty rx buffer
     uint8_t c = buffAddr[buffOut];
     return c;
 }
 
 int MultiUART::last (void) {
+    if (hSerial) hSerialReader();
     if (buffIn == buffOut) return -1;           // empty rx buffer
     uint8_t c = buffAddr[(buffIn - 1) & buffMax];
     return c;
+}
+
+int MultiUART::available (void) {
+    if (hSerial) hSerialReader();
+    return ((uint8_t)(buffIn - buffOut) & buffMax);
+}
+
+int MultiUART::availableForWrite (void) {
+    if (hSerial) return hSerial->availableForWrite();
+    return 1;
+}
+
+void MultiUART::hSerialReader (void) {
+    while (((buffIn - buffOut) & buffMax) < buffMax && hSerial->available()) {
+        buffAddr[buffIn++] = (uint8_t) hSerial->read();
+        buffIn &= buffMax;
+    }
 }
 
 // end of code
