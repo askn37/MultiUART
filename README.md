@@ -142,7 +142,7 @@ MultiUART RxOnly2(RX_PIN, RX_PIN);		// これも受信専用
 
 ### MultiUART (HardwereSerial& SERIAL)
 
-通常のコンストラクタ初期化に代えて、HardwereSerialクラスオブジェクトを渡すと
+通常のコンストラクタ初期化に代えて、HardwereSerialクラスオブジェクトを渡すと
 MultiUARTは HardwereSerialへの透過的ブリッジとして機能するようになる。
 
 ```c
@@ -155,7 +155,7 @@ auto CON = new MultiUART(Serial1);
 CON->begin(9600);
 ```
 
-この機能は MultiUARTクラスを継承した子孫クラスを作成・使用した場合、
+この機能は MultiUARTクラスを継承した子孫クラスを作成・使用した場合、
 その子孫クラスに MultiUARTによるソフトウェアシリアルと、
 AVRによるハードウェア支援のされたハードウェアシリアルを
 選択する自由を与える。
@@ -471,7 +471,7 @@ UART.setWriteBack();
 
 この機能を停止するには、空引数でメソッドを呼ぶ。
 
-コールバックには現在のところ、自動的に this を設定するようなことはない。
+コールバックには現在のところ、自動的に this を設定するようなことはない。
 this は呼び出される側の名前空間のままである。
 
 HardwareSerial ブリッジに対しても同様に機能する。
@@ -603,6 +603,6 @@ MIT
 # 著作表示
 
 朝日薫 / askn
-(SenseWay Inc.)  
-Twitter: [@askn37](https://twitter.com/askn37)  
+(SenseWay Inc.)
+Twitter: [@askn37](https://twitter.com/askn37)
 GitHub: https://github.com/askn37
