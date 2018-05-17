@@ -193,6 +193,7 @@ HardwareSerial の返す真偽値となる。
 ### bool begin (long BAUDRATE)
 
 オブジェクトにボーレートを設定し、受信処理を開始する。
+（HardwareSerialブリッジ時を除き）
 すでに同時受信利用可能UART数を超えている場合は偽を返し、受信処理は有効にならない。
 
 ```c
