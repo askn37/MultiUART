@@ -86,7 +86,7 @@ public:
     ~MultiUART (void) { stopListening(); }
     inline operator bool (void) { return true; }
 
-    virtual bool begin (long = 9600);
+    virtual bool begin (long = 9600, uint8_t = SERIAL_8N1);
     virtual bool listen (void);
     virtual bool isListening (void);
     virtual bool stopListening (void);

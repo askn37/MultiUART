@@ -183,10 +183,10 @@ MultiUART::MultiUART (HardwareSerial& _SERIAL)
 //
 // Methods and Functions
 //
-bool MultiUART::begin (long _speed) {
+bool MultiUART::begin (long _speed, uint8_t _config) {
     if (!MultiUART::throttle) MultiUART::setThrottle(MULTIUART_BASEFREQ_THROTTLE);
     if (hSerial) {
-        hSerial->begin(_speed);
+        hSerial->begin(_speed, _config);
         return true;
     }
     bitSkip = MULTIUART_BASEFREQ / _speed;

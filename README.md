@@ -190,7 +190,7 @@ HardwareSerial の返す真偽値となる。
 
 ## リソース制御
 
-### bool begin (long BAUDRATE)
+### bool begin (long BAUDRATE, uint8_t config = SERIAL_8N1)
 
 オブジェクトにボーレートを設定し、受信処理を開始する。
 （HardwareSerialブリッジ時を除き）
@@ -204,7 +204,10 @@ if (!UART.begin(9600)) Serial.println("not ready");
 他のオブジェクトに対して stopListening() （あるいはデストラクタ）を発行してから
 listen() を実行することでエラー状態から復せる。
 
-便宜上（好ましくはないことだが）引数を省略してもエラーにはならない。
+第2引数はシリアルポートとしての設定であるが MultiUARTでは 8N1 に固定である。
+hardwareSerialブリッジとした場合は省略することも、任意の指定もできる。
+
+便宜上（好ましくはないことだが）第1引数まですべて省略してもエラーにはならない。
 既定値として 9600 が採用される。
 
 ### bool listen (void)
