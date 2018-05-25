@@ -17,8 +17,8 @@
 #define MULTIUART_BASEFREQ 19200
 #endif
 
-#ifndef MULTIUART_BASEFREQ_THROTTLE
-#define MULTIUART_BASEFREQ_THROTTLE 1009
+#ifndef MULTIUART_BASEFREQ_ARIGN
+#define MULTIUART_BASEFREQ_ARIGN 0
 #endif
 
 #ifndef MULTIUART_RX_BUFF_LEN
@@ -30,18 +30,18 @@
 #endif
 
 //// using pinOut A2
-#define MULTIUART_DEBUG_PULSE
+// #define MULTIUART_DEBUG_PULSE
 
 #if defined(MULTIUART_USED_TIMER2)
-#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ / 8)
+#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ / 8 - MULTIUART_BASEFREQ_ARIGN)
 #else
 #ifndef MULTIUART_USED_TIMER1
 #define MULTIUART_USED_TIMER1
 #endif
-#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ)
+#define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ - MULTIUART_BASEFREQ_ARIGN)
 #endif
 
-#if MULTIUART_CTC_TOP < 15
+#if MULTIUART_CTC_TOP < 250
 #error MULTIUART_BASEFREQ is under run, bad configuration from MultiUART
 #endif
 
@@ -51,11 +51,11 @@ private:
     volatile char* buffAddr;
     volatile uint8_t *portTxReg;
     volatile uint8_t *portRxReg;
-    volatile uint8_t portTxMask;
     volatile uint8_t portRx;
     volatile uint8_t portRxMask;
     volatile uint8_t bitCount;
     volatile uint8_t bitSkip;
+    volatile uint8_t bitWait;
     volatile uint8_t bitStart;
     volatile uint8_t bitIn;
     volatile uint8_t buffMax;
@@ -63,19 +63,21 @@ private:
     volatile uint8_t buffOut;
     volatile uint8_t buffOver:1;
 
-    typedef void (*MultiUART_CallBack)(MultiUART*);
-    MultiUART_CallBack writeBack;
-    static void writeBackEmpty (MultiUART*) {}
-
     static volatile MultiUART *listeners[MULTIUART_RX_LISTEN_LEN];
     static volatile uint16_t throttle;
     static volatile uint16_t bitSendBuff;
     static volatile uint8_t* bitSendPort;
     static volatile uint8_t bitSendMask;
-    static volatile uint8_t bitSendClear;
     static volatile uint8_t bitSendSkip;
+    static volatile uint8_t bitSendWait;
     static volatile uint8_t bitSendCount;
     static volatile uint8_t baseClock;
+
+    uint8_t portTxMask;
+
+    typedef void (*MultiUART_CallBack)(MultiUART*);
+    MultiUART_CallBack writeBack;
+    static void writeBackEmpty (MultiUART*) {}
 
     HardwareSerial *hSerial;
     void hSerialReader (void);
@@ -90,6 +92,7 @@ public:
     virtual bool listen (void);
     virtual bool isListening (void);
     virtual bool stopListening (void);
+    virtual void stopListener (void);
     void end (void) { if (hSerial) hSerial->end(); else stopListening(); }
     inline uint8_t getBaseClock (void) { return MultiUART::baseClock; }
 
@@ -109,8 +112,10 @@ public:
     virtual size_t write (const uint8_t);
     virtual int availableForWrite (void);
 
-    static void setThrottle (uint16_t = MULTIUART_BASEFREQ_THROTTLE);
+    static void setThrottle (int16_t = 0);
     static inline void interrupt_handle (void) __attribute__((__always_inline__));
 };
 
 #endif
+
+// end of header
