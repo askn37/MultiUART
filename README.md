@@ -2,7 +2,7 @@
 
 復数のUARTデバイスを扱える SoftwareSerial の代替実装（for Arduino IDE）
 
-# 概要
+## 概要
 
 Arduino標準の SoftwareSerialは、とても良く出来てはいるものの以下の制約がある。
 
@@ -32,7 +32,7 @@ UARTに対応したアプリケーションを書ける。
 - 調歩同期のための受信割込処理は非常に重く、16Mhz駆動時でも40%以上の CPUタイムを常に消費する。
 16Mhz未満の、あるいは内蔵RC発振器を使用している場合、多くは期待通りに動作しない。
 
-# Arduino IDE への導入
+## Arduino IDE への導入
 
 1. .ZIPアーカイブをダウンロードする。[Click here](https://github.com/askn37/MultiUART/archive/master.zip)
 
@@ -40,9 +40,9 @@ UARTに対応したアプリケーションを書ける。
 
   スケッチ -> ライブラリをインクルード -> .ZIP形式のライブラリをインストール...
 
-# 使い方
+## 使い方
 
-## とっかかり
+### とっかかり
 
 SoftwareSerial と同様に、コンストラクタで入出力に使うピンを指定し、
 Arduinoのセットアップで MultiUART::begin() にボーレートを指定して呼び出す。
@@ -70,7 +70,7 @@ void loop() {
 }
 ```
 
-## 復数UARTの並列使用
+### 復数UARTの並列使用
 
 最大4つまでのUARTを同時に開くことが出来る。
 
@@ -88,20 +88,20 @@ MCUの処理能力（CPUクロックや割込頻度）によっては受信デ�
 ボーレートのより高い UARTデバイスには優先的に begin() を発行して利用開始することが望ましい。
 ただし stopListening() と listen() を繰り返したのちの、優先保証はされない。
 
-## 指定可能なボーレート
+### 指定可能なボーレート
 
 begin() に指定できるボーレートは、通常の使用範囲では 9600(bps)が最大である。
 実用上の最小値は 768(bps)で、その間には 19200 の約数が指定できる。
 
     9600 6400 4800 3840 3200 2400 1920 1600 1280 1200 960 800 768
 
-# リファレンス
+## リファレンス
 
 ここでは Arduinoスタイルではなく、型を含めた C/C++スタイルで各メソッドを記述する。
 
-## コンストラクタ
+### コンストラクタ
 
-### MultiUART (uint8\_t RX\_PIN, uint8\_t TX\_PIN)
+#### MultiUART (uint8\_t RX\_PIN, uint8\_t TX\_PIN)
 
 クラスオブジェクト生成にはこのコンストラクタを使用する。
 受信ピン、送信ピンの指定は必須である。
@@ -139,7 +139,7 @@ MultiUART RxOnly2(RX_PIN, RX_PIN);		// これも受信専用
 
 受信ピンと送信ピンに同じピン番号を与えると、送信ピン指定は無視されて、受信専用に設定される。
 
-### MultiUART (HardwereSerial& SERIAL)
+#### MultiUART (HardwereSerial& SERIAL)
 
 通常のコンストラクタ初期化に代えて、HardwereSerialクラスオブジェクトを渡すと
 MultiUARTは HardwereSerialへの透過的ブリッジとして機能するようになる。
@@ -176,7 +176,7 @@ MultiUARTの機能のうち、last() や setRxBuffer() 等が使用可能にな�
 
 本機能は 0.9.6 で実装された。
 
-### operator bool (void)
+#### operator bool (void)
 
 真偽値として評価された場合、通信準備ができているかを返す。
 実際には常に真を返す。
@@ -188,9 +188,9 @@ if (UART) Serial.println("true");
 ただし HardwareSerial ブリッジとして使用している場合は、
 HardwareSerial の返す真偽値となる。
 
-## リソース制御
+### リソース制御
 
-### bool begin (long BAUDRATE, uint8_t config = SERIAL_8N1)
+#### bool begin (long BAUDRATE, uint8_t config = SERIAL_8N1)
 
 オブジェクトにボーレートを設定し、受信処理を開始する。
 （HardwareSerialブリッジ時を除き）
@@ -210,7 +210,7 @@ hardwareSerialブリッジとした場合は省略することも、任意の指
 便宜上（好ましくはないことだが）第1引数まですべて省略してもエラーにはならない。
 既定値として 9600 が採用される。
 
-### bool listen (void)
+#### bool listen (void)
 
 このオブジェクトの受信処理を開始する。
 すでに同時受信利用可能UART数を超えている場合は偽を返す。
@@ -222,13 +222,13 @@ SoftwareSerial の同名メソッドとは異なり、他のオブジェクト�
 
 HardwareSerial ブリッジの場合は意味をなさず、常に真を返す。
 
-### bool isListening (void)
+#### bool isListening (void)
 
 このオブジェクトが受信可能かを返す。listen() していなければ偽を返す。
 
 HardwareSerial ブリッジの場合は意味をなさず、常に真を返す。
 
-### bool stopListening (void)
+#### bool stopListening (void)
 
 このオブジェクトの受信処理を停止する。
 停止に成功すると真を、既に停止している場合は偽を返す。
@@ -238,7 +238,7 @@ HardwareSerial ブリッジの場合は意味をなさず、常に真を返す�
 
 HardwareSerial ブリッジの場合は意味をなさず、常に偽を返す。
 
-### void end (void);
+#### void end (void);
 
 オブジェクトの受信処理を停止する。
 stopListening() と違い返値を戻さない。
@@ -252,21 +252,21 @@ stopListening() と違い返値を戻さない。
 HardwareSerial ブリッジの場合は
 HardwareSerial のデストラクタが呼ばれ、対応するIOピンが未使用になる。
 
-## 受信機能
+### 受信機能
 
-### int read (void)
+#### int read (void)
 
 使用している受信バッファから1キャラクタを読んで返す。
 読んだ文字は受信バッファから除かれる。
 バッファが空の場合は -1 が返される。
 
-### int peek (void)
+#### int peek (void)
 
 使用している受信バッファから先頭の1キャラクタを読んで返す。
 読んだ文字は受信バッファから除かれずに残る。
 バッファが空の場合は -1 が返される。
 
-### int last (void)
+#### int last (void)
 
 使用している受信バッファから末尾の1キャラクタを読んで返す。
 読んだ文字は受信バッファから除かれずに残る。
@@ -279,12 +279,12 @@ HardwareSerial のデストラクタが呼ばれ、対応するIOピンが未使
 
 こもメソッドは 0.9.3 で実装された。
 
-### int available (void);
+#### int available (void);
 
 使用している受信バッファに貯められている文字数を返す。
 バッファが空であれば 0を返す。
 
-### bool overflow (void)
+#### bool overflow (void)
 
 使用している受信バッファが溢れているなら真を返す。
 溢れフラグはこのメソッドを呼ぶことでクリアされる。
@@ -293,16 +293,16 @@ HardwareSerial のデストラクタが呼ばれ、対応するIOピンが未使
 
 HardwareSerial ブリッジに対しては機能せず、常に偽を返す。
 
-### bool isFraming (void)
+#### bool isFraming (void)
 
 フレーム受信途中であるなら真を返す。
 すなわちスタートビットを認識し、ストップビットがまだ判定されていないことを示す。
 
 HardwareSerial ブリッジに対しては機能せず、常に偽を返す。
 
-## 送信機能
+### 送信機能
 
-### size\_t write (const uint8\_t character)
+#### size\_t write (const uint8\_t character)
 
 指定したキャラクタ文字を送信する。
 本ライブラリの実装では送信バッファを持たないため、送信は都度、同期的に行われる。
@@ -316,29 +316,29 @@ isListening() が偽を返しても、受信と送信は独立しているので
 また遅いボーレートに対してはより多くの時間を、割込対応以外の何も出来ない waitに割くこととなる。
 現在のところ長いビット送信の合間に yield() を呼ぶような救済処置は実装されていない。
 
-### void flush (void)
+#### void flush (void)
 
 送信バッファがすべて書き出されるまで待つ。
 しかしながら本ライブラリは送信バッファを持たないので、このメソッドは何もせずにすぐ戻る。
 
 HardwareSerial ブリッジに対しては額面通りに機能する。
 
-### int availableForWrite (void)
+#### int availableForWrite (void)
 
 送信バッファの空き文字数を返す。
 しかしながら本ライブラリは送信バッファを持たないので、このメソッドは常に 1を返す。
 
 HardwareSerial ブリッジに対しては額面通りに機能する。
 
-## ユーティリティ／実験的実装
+### ユーティリティ／実験的実装
 
-### uint8_t getBaseClock (void)
+#### uint8_t getBaseClock (void)
 
 基準クロックでインクリメントされている 8bitカウンタの値を返す。
 分解能は既定値で 52us、13.3ms強で1周している。
 これよりも長く低速なボーレートと、分解能の2倍に満たない高速なボーレートには対応できない。
 
-### void stopListener (void)
+#### void stopListener (void)
 
 基準クロック割込を停止し、すべての UARTも停止する。
 これはオブジェクト個別に stopListening() を行うよりも強力に実施される。
@@ -356,7 +356,7 @@ UART.stopListener();
 
 受信処理を再開するには、各オブジェクトに対して個別に listen() を使用する。
 
-### void setRxBuffer (volatile char* BUFFER, int LENGTH);
+#### void setRxBuffer (volatile char* BUFFER, int LENGTH);
 
 実験的実装：
 オブジェクトに外部の受信バッファを設定する。
@@ -421,7 +421,7 @@ else {
 
 HardwareSerial ブリッジに対しても同様に機能する。
 
-### void setWriteBack ( void(\*CALLBACK)(MultiUART\*) )
+#### void setWriteBack ( void(\*CALLBACK)(MultiUART\*) )
 
 実験的実装：
 このメソッドでコールバック関数を設定すると、
@@ -472,7 +472,7 @@ this は呼び出される側の名前空間のままである。
 
 HardwareSerial ブリッジに対しても同様に機能する。
 
-### void setThrottle (int16_t CLOCKALIGN)
+#### void setThrottle (int16_t CLOCKALIGN)
 
 実験的実装：
 基準クロックを増減するためのスロットル値を整数で指定する。
@@ -502,7 +502,7 @@ HardwareSerial ブリッジに対しては機能しない。
 
 このメソッドは 0.9.4 で実装されたが 0.9.6 で仕様が変更された。
 
-## その他
+### その他
 
 Stream と Print クラスを継承しているため、以下のメソッドが機能する。
 
@@ -518,9 +518,9 @@ Stream と Print クラスを継承しているため、以下のメソッドが
     serialEvent()
 
 
-# 応用
+## 応用
 
-## 基準クロックの変更
+### 基準クロックの変更
 
 ライブラリをインクルードする前に、以下の定数を宣言することで規定の基準クロックを変更できる。
 
@@ -534,7 +534,7 @@ Stream と Print クラスを継承しているため、以下のメソッドが
 ただし 19200設定時、CPUが 16Mhz駆動で 45%、
 8Mhz駆動で 90% もの CPU稼働時間が割込処理のためだけに消費される点に留意が必要だ。
 
-## 受信バッファサイズの変更
+### 受信バッファサイズの変更
 
 ライブラリをインクルードする前に、以下の定数を宣言することで規定の受信バッファサイズを変更できる。
 
@@ -555,7 +555,7 @@ Stream と Print クラスを継承しているため、以下のメソッドが
 
 この値の既定値は 0.9.3 で変更された。
 
-## 同時受信可能UART数の変更
+### 同時受信可能UART数の変更
 
 ライブラリをインクルードする前に、以下の定数を宣言することで規定の同時受信可能なUART数を変更できる。
 
@@ -568,7 +568,7 @@ Stream と Print クラスを継承しているため、以下のメソッドが
 
 この値を減らすのはともかく、増やすのは賢明ではない。stopListening() を活用すべきである。
 
-# ボーレート生成タイマーの変更
+### ボーレート生成タイマーの変更
 
 ライブラリをインクルードする前に、以下の定数を宣言することで規定のボーレート生成タイマーを変更できる。
 
@@ -593,23 +593,23 @@ setThrottle() が、この設定を動的に調律可能とするため 0.9.4 �
 
 この設定は 0.9.2 で追加された。
 
-# 既知の不具合／制約／課題
+## 既知の不具合／制約／課題
 
 - 受信割込、serialEvent() に相当する機能がない。
 - 主要な AVR 以外はテストされていない。
 - 古い Arduino IDE には対応しない。1.8.5で動作確認。少なくとも C++11 は使えなければならない。
 - 英文マニュアルが未整備である。
 
-# 改版履歴
+## 改版履歴
 
 - 0.9.6
   - 機能拡張：HardwareSerial ブリッジ
 
-# 使用許諾
+## 使用許諾
 
 MIT
 
-# 著作表示
+## 著作表示
 
 朝日薫 / askn
 (SenseWay Inc.)

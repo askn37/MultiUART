@@ -15,7 +15,7 @@
 //
 // Interrupt handling
 //
-#pragma GCC optimize ("O3")
+// #pragma GCC optimize ("O3")
 
 #if defined(MULTIUART_USED_TIMER1)
 #if defined(TIMER1_COMPA_vect)
@@ -109,7 +109,7 @@ inline void MultiUART::interrupt_handle (void) {
         }
     }
 }
-#pragma GCC optimize ("Os")
+// #pragma GCC optimize ("Os")
 
 void MultiUART::setThrottle (int16_t _throttle) {
     uint16_t freqClock = MULTIUART_CTC_TOP - 1 - _throttle;

@@ -47,8 +47,6 @@
 
 class MultiUART : public Stream {
 private:
-    volatile char buff[MULTIUART_RX_BUFF_LEN];
-    volatile char* buffAddr;
     volatile uint8_t *portTxReg;
     volatile uint8_t *portRxReg;
     volatile uint8_t portRx;
@@ -63,7 +61,9 @@ private:
     volatile uint8_t buffOut;
     volatile uint8_t buffOver:1;
 
-    static volatile MultiUART *listeners[MULTIUART_RX_LISTEN_LEN];
+    volatile char buff[MULTIUART_RX_BUFF_LEN];
+    volatile char* buffAddr;
+
     static volatile uint16_t throttle;
     static volatile uint16_t bitSendBuff;
     static volatile uint8_t* bitSendPort;
@@ -72,6 +72,8 @@ private:
     static volatile uint8_t bitSendWait;
     static volatile uint8_t bitSendCount;
     static volatile uint8_t baseClock;
+
+    static volatile MultiUART *listeners[MULTIUART_RX_LISTEN_LEN];
 
     uint8_t portTxMask;
 
