@@ -41,7 +41,7 @@
 #define MULTIUART_CTC_TOP (F_CPU / MULTIUART_BASEFREQ - MULTIUART_BASEFREQ_ARIGN)
 #endif
 
-#if MULTIUART_CTC_TOP < 250
+#if MULTIUART_CTC_TOP < 200
 #error MULTIUART_BASEFREQ is under run, bad configuration from MultiUART
 #endif
 
