@@ -47,8 +47,8 @@
 
 class MultiUART : public Stream {
 private:
-    volatile uint8_t *portTxReg;
-    volatile uint8_t *portRxReg;
+    volatile uint8_t *portTxReg = NULL;
+    volatile uint8_t *portRxReg = NULL;
     volatile uint8_t portRx;
     volatile uint8_t portRxMask;
     volatile uint8_t bitCount;
@@ -83,6 +83,7 @@ private:
 
     HardwareSerial *hSerial;
     void hSerialReader (void);
+    void initConst (void);
 
 public:
     MultiUART (uint8_t, uint8_t);

@@ -142,18 +142,9 @@ void MultiUART::setThrottle (int16_t _throttle) {
 //
 // Constructor
 //
-MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN)
-    : bitCount(0)
-    , buffAddr(&buff[0])
-    , buffIn(0)
-    , buffOut(0)
-    , buffMax(MULTIUART_RX_BUFF_LEN - 1)
-    , buffOver(false)
-    , portRxMask(0)
-    , portTxMask(0)
-    , writeBack(writeBackEmpty)
-    , hSerial(NULL)
-{
+MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN) {
+    MultiUART::initConst();
+    hSerial = nullptr;
     uint8_t _rx = digitalPinToPort(_RX_PIN);
     uint8_t _tx = digitalPinToPort(_TX_PIN);
     if (_tx != NOT_A_PIN && _RX_PIN != _TX_PIN) {
@@ -171,18 +162,17 @@ MultiUART::MultiUART (uint8_t _RX_PIN, uint8_t _TX_PIN)
     }
 }
 
-MultiUART::MultiUART (HardwareSerial& _SERIAL)
-    : bitCount(0)
-    , buffAddr(&buff[0])
-    , buffIn(0)
-    , buffOut(0)
-    , buffMax(MULTIUART_RX_BUFF_LEN - 1)
-    , buffOver(false)
-    , portRxMask(0)
-    , portTxMask(0)
-    , writeBack(writeBackEmpty)
-{
+MultiUART::MultiUART (HardwareSerial& _SERIAL) {
+    MultiUART::initConst();
     hSerial = &_SERIAL;
+}
+
+void MultiUART::initConst (void) {
+    buffAddr = &buff[0];
+    buffMax = MULTIUART_RX_BUFF_LEN - 1;
+    buffOver = false;
+    bitCount = buffIn = buffOut = portRxMask = portTxMask = 0;
+    writeBack = writeBackEmpty;
 }
 
 //
