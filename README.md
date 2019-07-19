@@ -94,9 +94,9 @@ MCUの処理能力（CPUクロックや割込頻度）によっては受信デ�
 begin() に指定できるボーレートは、通常の使用範囲では 9600(bps)が最大である。
 実用上の最小値は 768(bps)で、その間には 19200 の約数が指定できる。
 
-    9600 6400 4800 3840 3200 2400 1920 1600 1280 1200 960 800 768
+  9600 6400 4800 3840 3200 2400 1920 1600 1280 1200 960 800 768
 
-# リファレンス
+## リファレンス
 
 ここでは Arduinoスタイルではなく、型を含めた C/C++スタイルで各メソッドを記述する。
 
@@ -133,9 +133,9 @@ SoftwareSerial と異なり、Invertedフラグは指定できない。
 従って受信のみ、あるいは送信のみが有効なオブジェクトを作ることが出来る。
 
 ```c
-MultiUART TxOnly(-1, TX_PIN);			// 送信専用で write() だけが機能する
-MultiUART RxOnly(RX_PIN, -1);			// 受信専用で write() は何もしない
-MultiUART RxOnly2(RX_PIN, RX_PIN);		// これも受信専用
+MultiUART TxOnly(-1, TX_PIN);           // 送信専用で write() だけが機能する
+MultiUART RxOnly(RX_PIN, -1);           // 受信専用で write() は何もしない
+MultiUART RxOnly2(RX_PIN, RX_PIN);      // これも受信専用
 ```
 
 受信ピンと送信ピンに同じピン番号を与えると、送信ピン指定は無視されて、受信専用に設定される。
@@ -163,12 +163,12 @@ AVRによるハードウェア支援のされたハードウェアシリアル�
 MultiUARTの機能のうち、last() や setRxBuffer() 等が使用可能になる。
 一方で以下のメソッドは機能しないか意味をなさない。
 
-    overflow() isFraming() listen() isListening()
-    stopListening() stopListener() setThrottle()
+  overflow() isFraming() listen() isListening()
+  stopListening() stopListener() setThrottle()
 
 以下のメソッドは MultiUART では機能しないが、HardwareSerialブリッジでは機能する
 
-    flush() availableForWrite()
+  flush() availableForWrite()
 
 同時使用可能な UART数に、HardwareSerialブリッジは含まれない。
 
@@ -239,7 +239,7 @@ HardwareSerial ブリッジの場合は意味をなさず、常に真を返す�
 
 HardwareSerial ブリッジの場合は意味をなさず、常に偽を返す。
 
-### void end (void);
+### void end (void)
 
 オブジェクトの受信処理を停止する。
 stopListening() と違い返値を戻さない。
@@ -280,7 +280,7 @@ HardwareSerial のデストラクタが呼ばれ、対応するIOピンが未使
 
 こもメソッドは 0.9.3 で実装された。
 
-### int available (void);
+### int available (void)
 
 使用している受信バッファに貯められている文字数を返す。
 バッファが空であれば 0を返す。
@@ -357,7 +357,7 @@ UART.stopListener();
 
 受信処理を再開するには、各オブジェクトに対して個別に listen() を使用する。
 
-### void setRxBuffer (volatile char* BUFFER, int LENGTH);
+### void setRxBuffer (volatile char* BUFFER, int LENGTH)
 
 実験的実装：
 オブジェクトに外部の受信バッファを設定する。
@@ -366,7 +366,7 @@ UART.stopListener();
 従って指定できる値は実用上、以下の値に限られる。
 これら以外の指定は意図した結果を得られないだろう。
 
-    256 128 (64 32 16)
+  256 128 (64 32 16)
 
 このメソッドを用いても、オブジェクトが持つ規定のバッファがメモリから開放されることはない。
 その既定値は 64であるため、この機能をが必要になる場面はそう多くはない。
@@ -507,17 +507,16 @@ HardwareSerial ブリッジに対しては機能しない。
 
 Stream と Print クラスを継承しているため、以下のメソッドが機能する。
 
-    print() println()
+  print() println()
 
 以下のメソッドは使えるはずだが、充分にはテストされていない。
 
-    setTimeout() find() findUntil() readBytes() readBytesUntil()
-    readString() readStringUntil() parseInt() parseFloat()
+  setTimeout() find() findUntil() readBytes() readBytesUntil()
+  readString() readStringUntil() parseInt() parseFloat()
 
 以下のコールバック関数宣言はサポートされない。
 
-    serialEvent()
-
+  serialEvent()
 
 ## 応用
 
@@ -548,7 +547,7 @@ Stream と Print クラスを継承しているため、以下のメソッドが
 指定できる値には制約があり、256以下でかつ2のべき乗数としなければならない。
 すなわち指定できる値は実用上、以下の値に限られる。
 
-    256 128 (64 32 16)
+  256 128 (64 32 16)
 
 この値の変更は SRAMの空き容量とバーターである。
 さらに現状では、個別のオブジェクト毎に割り当てを変えることも出来ない。
@@ -615,4 +614,4 @@ MIT
 朝日薫 / askn
 (SenseWay Inc.)
 Twitter: [@askn37](https://twitter.com/askn37)
-GitHub: https://github.com/askn37
+GitHub: [https://github.com/askn37](https://github.com/askn37)
